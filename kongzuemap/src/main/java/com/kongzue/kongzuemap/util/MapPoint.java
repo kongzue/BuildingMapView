@@ -22,7 +22,7 @@ public class MapPoint extends PointF {
         this.y = y;
         this.label = label;
     }
-
+    
     
     public MapPoint(float x, float y) {
         this.x = x;
@@ -63,6 +63,27 @@ public class MapPoint extends PointF {
                 ", y=" + y +
                 ", label=" + label +
                 '}');
+        return this;
+    }
+    
+    //以下是测试用
+    public MapPoint subY() {
+        y = y - 1f;
+        return this;
+    }
+    
+    public MapPoint addY() {
+        y = y + 1f;
+        return this;
+    }
+    
+    public MapPoint subX() {
+        x = x - 1f;
+        return this;
+    }
+    
+    public MapPoint addX() {
+        x = x + 1f;
         return this;
     }
 }

@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.kongzue.kongzuemap.MapView2
+    <com.kongzue.kongzuemap.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.kongzue.kongzuemap.MapView2>
+        android:layout_height="match_parent"></com.kongzue.kongzuemap.MapView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,5 +42,23 @@
             android:text="→" />
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_centerVertical="true"
+            android:background="#1b000000"/>
+
+        <ImageView
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:background="#1b000000"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>
