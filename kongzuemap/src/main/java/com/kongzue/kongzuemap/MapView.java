@@ -158,8 +158,37 @@ public class MapView extends View {
                 
             }
             
+            //只有当前点，没有目标点的情况
+            if (locPoint != null && aimPoint == null) {
+                
+                scale = 1;
+                
+                //缩放
+                canvas.scale(scale, scale);
+                
+                PointF midPoint = new PointF(locPoint.x, locPoint.y);
+                midPoint.x = midPoint.x * defaultZoom - min_x - (getWidth() / 2 / scale);
+                midPoint.y = midPoint.y * defaultZoom - min_y - (getHeight() / 2 / scale);
+                
+                moveDistance = midPoint;
+            }
+            
             //位移距离
-            if (moveDistance != null) canvas.translate(-moveDistance.x, -moveDistance.y);
+            if (moveDistance != null) {
+                canvas.translate(-moveDistance.x, -moveDistance.y);
+                log("move:  x=" + moveDistance.x + "  y=" + moveDistance.y);
+            }
+            
+            //双指缩放
+            if (locPoint == null && aimPoint == null && !mapTouchLock) {
+                if (doubleTouchMidPoint != null) {
+                    canvas.scale(mapScale, mapScale,
+                                 moveDistance.x + doubleTouchMidPoint.x, moveDistance.y + doubleTouchMidPoint.y
+                    ); //缩放
+                } else {
+                    canvas.scale(mapScale, mapScale); //缩放
+                }
+            }
             
             Paint paint = new Paint();
             
@@ -181,13 +210,27 @@ public class MapView extends View {
             
             //绘制点
             for (MapPoint mapPoint : mapPointList) {
+                int color = Color.BLACK;
+                switch (mapPoint.getStage()){
+                    case 0:
+                        color = Color.rgb(50, 123, 254);            //蓝色
+                        break;
+                    case 1:
+                        color = Color.rgb(100, 217, 100);            //绿色
+                        break;
+                    case 2:
+                        color = Color.rgb(200, 199, 204);            //灰色
+                        break;
+                }
+    
                 paint.setStyle(Paint.Style.FILL);
                 paint.setTextAlign(Paint.Align.CENTER);     //设置居中绘制文字
+                paint.setColor(color);
                 paint.setTextSize(18); //设置字号
                 canvas.drawText(mapPoint.getLabel(), mapPoint.x * defaultZoom - min_x, mapPoint.y * defaultZoom - min_y + 8, paint);
-                
+    
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.BLACK);
+                paint.setColor(color);
                 paint.setStrokeWidth(1.5f);
                 canvas.drawCircle(mapPoint.x * defaultZoom - min_x, mapPoint.y * defaultZoom - min_y, 26, paint);
             }
@@ -235,6 +278,11 @@ public class MapView extends View {
     private PointF moveDistance;        //地图位移的距离
     private PointF movedDistance;       //记录上一次已经位移的距离
     private float mapScale = 1.0f;            //地图缩放比
+    
+    private float mapScale_Temp = 1.0f;
+    private float doubleTouchDistance;
+    private PointF doubleTouchMidPoint;
+    private boolean doubleTouched = false;
     
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -286,31 +334,34 @@ public class MapView extends View {
                     break;
             }
         } else if (MotionEventCompat.getPointerCount(event) == 2) {             //双指触摸
-
-//            if (localPoint != null) {
-//                invalidate();   //重绘
-//                return false;
-//            }
-//
-//            switch (event.getAction() & MotionEvent.ACTION_MASK) {           //处理多点触摸
-//                case MotionEvent.ACTION_POINTER_DOWN:
-//                    mapScale_Temp = mapScale;
-//                    doubleTouchDistance = getDistance(event);
-//                    doubleTouchMidPoint = getMidPoint(event);
-//                    break;
-//                case MotionEvent.ACTION_MOVE:
-//                    double distance = getDistance(event);
-//                    if (distance > 10f) {
-//                        mapScale = (float) (mapScale_Temp * distance / doubleTouchDistance);
-//                        invalidate();   //重绘
-//                    }
-//                    break;
-//                case MotionEvent.ACTION_POINTER_UP:
-//                    log("ACTION_POINTER_UP");
-//                    touchFlag = false;
-//                    break;
-//
-//            }
+            
+            if (mapPointList == null) {
+                return false;
+            }
+            
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {           //处理多点触摸
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    doubleTouched = true;
+                    //log("ACTION_POINTER_DOWN");
+                    mapScale_Temp = mapScale;
+                    doubleTouchDistance = getDistance(event);
+                    doubleTouchMidPoint = getMidPoint(event);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    //log("ACTION_MOVE");
+                    double distance = getDistance(event);
+                    if (distance > 10f) {
+                        mapScale = (float) (mapScale_Temp * distance / doubleTouchDistance);
+                        invalidate();   //重绘
+                    }
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
+                    doubleTouched = false;
+                    //log("ACTION_POINTER_UP");
+                    touchFlag = false;
+                    break;
+                
+            }
         }
         return true;
     }

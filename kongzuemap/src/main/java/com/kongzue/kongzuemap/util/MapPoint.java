@@ -16,11 +16,19 @@ public class MapPoint extends PointF {
     public float x;
     public float y;
     public String label;
+    public int stage = -1;
     
     public MapPoint(float y, float x, String label) {
         this.x = x;
         this.y = y;
         this.label = label;
+    }
+    
+    public MapPoint(float y, float x, String label,int stage) {
+        this.x = x;
+        this.y = y;
+        this.label = label;
+        this.stage = stage;
     }
     
     
@@ -84,6 +92,15 @@ public class MapPoint extends PointF {
     
     public MapPoint addX() {
         x = x + 1f;
+        return this;
+    }
+    
+    public int getStage() {
+        return stage;
+    }
+    
+    public MapPoint setStage(int stage) {
+        this.stage = stage;
         return this;
     }
 }

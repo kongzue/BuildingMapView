@@ -2,7 +2,7 @@
 主要用于将需展示的大量坐标点地图绘制出来，并实现简易的指引性导航
 
 <a href="https://github.com/kongzue/BuildingMapView/">
-<img src="https://img.shields.io/badge/Kongzue%20BuildingMapView-5.0.0-green.svg" alt="Kongzue Dialog">
+<img src="https://img.shields.io/badge/Kongzue%20BuildingMapView-5.0.0-green.svg" alt="Kongzue BuildingMapView">
 </a>
 <a href="https://bintray.com/myzchh/maven/BuildingMapView/5.0.0/link">
 <img src="https://img.shields.io/badge/Maven-5.0.0-blue.svg" alt="Maven">
@@ -14,6 +14,8 @@
 <img src="https://img.shields.io/badge/Homepage-Kongzue.com-brightgreen.svg" alt="Homepage">
 </a>
 
+## 警告
+此项目目前不提供对外可直接引入的SDK文件，仅做展示使用。
 
 ## 演示
 
