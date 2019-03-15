@@ -36,15 +36,15 @@ public class MainActivity extends AppCompatActivity {
         btnTestDown = findViewById(R.id.btn_test_down);
         
         //锁定不允许自己缩放位移
-        //mapView.setMapTouchLock(true);
+        mapView.setMapTouchLock(false);
         
         //加载所有测试点
         initTestPoint();
         mapView.setMapPointList(mapPointList);
         
         //设置目标点和当前点
-        //mapView.setAimPoint(DemoPoint.getAimPoint());
-        //mapView.setLocPoint(DemoPoint.getLocalPoint());
+        mapView.setAimPoint(DemoPoint.getAimPoint());
+        mapView.setLocPoint(DemoPoint.getLocalPoint());
         
         btnTestDown.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     
     private void go(int where) {
         MapPoint locPoint = mapView.getLocPoint();
+        if (locPoint==null)return;
         switch (where) {                 //注意此处坐标系xy颠倒
             case UP:
                 locPoint.subX();

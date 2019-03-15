@@ -125,6 +125,10 @@ public class MapView extends View {
     protected void onDraw(Canvas canvas) {
         try {
             float scale = 1;
+            //双指缩放
+            if (moveDistance == null) {
+                moveDistance = new PointF(0, 0);
+            }
             
             //若有导航，计算出位移和缩放比
             if (locPoint != null && aimPoint != null) {
@@ -146,15 +150,30 @@ public class MapView extends View {
                 if (scale > 5) scale = 5;                       //最高放大5倍
                 
                 log("defaultZoom:" + defaultZoom);
+    
+                if (scale < 0.5) {
+                    //缩放倍数小于0.3的情况下，以loc为中心点，缩放倍数不变
+                    scale = 0.5f;
+        
+                    //缩放
+                    canvas.scale(scale, scale);
+        
+                    PointF midPoint = new PointF(locPoint.x, locPoint.y);
+                    midPoint.x = midPoint.x * defaultZoom - min_x - (getWidth() / 2 / scale);
+                    midPoint.y = midPoint.y * defaultZoom - min_y - (getHeight() / 2 / scale);
+        
+                    moveDistance = midPoint;
+                }else{
+                    //正常缩放
+                    canvas.scale(scale, scale);
+    
+                    PointF midPoint = getMidPoint(locPoint, aimPoint);
+                    midPoint.x = midPoint.x * defaultZoom - min_x - (getWidth() / 2 / scale);
+                    midPoint.y = midPoint.y * defaultZoom - min_y - (getHeight() / 2 / scale);
+    
+                    moveDistance = midPoint;
+                }
                 
-                //缩放
-                canvas.scale(scale, scale);
-                
-                PointF midPoint = getMidPoint(locPoint, aimPoint);
-                midPoint.x = midPoint.x * defaultZoom - min_x - (getWidth() / 2 / scale);
-                midPoint.y = midPoint.y * defaultZoom - min_y - (getHeight() / 2 / scale);
-                
-                moveDistance = midPoint;
                 
             }
             
@@ -176,10 +195,9 @@ public class MapView extends View {
             //位移距离
             if (moveDistance != null) {
                 canvas.translate(-moveDistance.x, -moveDistance.y);
-                log("move:  x=" + moveDistance.x + "  y=" + moveDistance.y);
+                //log("move:  x=" + moveDistance.x + "  y=" + moveDistance.y);
             }
             
-            //双指缩放
             if (locPoint == null && aimPoint == null && !mapTouchLock) {
                 if (doubleTouchMidPoint != null) {
                     canvas.scale(mapScale, mapScale,
@@ -211,7 +229,7 @@ public class MapView extends View {
             //绘制点
             for (MapPoint mapPoint : mapPointList) {
                 int color = Color.BLACK;
-                switch (mapPoint.getStage()){
+                switch (mapPoint.getStage()) {
                     case 0:
                         color = Color.rgb(50, 123, 254);            //蓝色
                         break;
@@ -222,13 +240,13 @@ public class MapView extends View {
                         color = Color.rgb(200, 199, 204);            //灰色
                         break;
                 }
-    
+                
                 paint.setStyle(Paint.Style.FILL);
                 paint.setTextAlign(Paint.Align.CENTER);     //设置居中绘制文字
                 paint.setColor(color);
                 paint.setTextSize(18); //设置字号
                 canvas.drawText(mapPoint.getLabel(), mapPoint.x * defaultZoom - min_x, mapPoint.y * defaultZoom - min_y + 8, paint);
-    
+                
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(color);
                 paint.setStrokeWidth(1.5f);
@@ -352,6 +370,10 @@ public class MapView extends View {
                     double distance = getDistance(event);
                     if (distance > 10f) {
                         mapScale = (float) (mapScale_Temp * distance / doubleTouchDistance);
+                        if (mapScale < 0.1f) mapScale = 0.1f;
+                        if (mapScale > 5.0f) mapScale = 5.0f;
+                        if (mapScale < 0.3f) mapScale = 0.3f;
+                        log("mapScale:" + mapScale);
                         invalidate();   //重绘
                     }
                     break;
