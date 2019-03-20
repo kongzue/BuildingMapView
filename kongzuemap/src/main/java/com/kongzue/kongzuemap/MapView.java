@@ -124,6 +124,16 @@ public class MapView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         try {
+    
+            //没有任何点时清空画布
+            if (mapPointList == null || mapPointList.isEmpty()) {
+                cleanAll(canvas);
+                Paint paint = new Paint();
+                paint.setColor(Color.WHITE);
+                canvas.drawRect(0,0,getWidth(),getHeight(), paint);
+                return;
+            }
+            
             float scale = 1;
             //双指缩放
             if (moveDistance == null) {
@@ -214,12 +224,6 @@ public class MapView extends View {
             canvas.drawPaint(paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
             paint.setAntiAlias(true);       //开启抗锯齿
-            
-            //没有任何点时清空画布
-            if (mapPointList == null || mapPointList.isEmpty()) {
-                cleanAll(canvas);
-                return;
-            }
             
             //绘制地图边界
             paint.setStyle(Paint.Style.STROKE);
